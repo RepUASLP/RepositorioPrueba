@@ -1,0 +1,22 @@
+# Ignorar ejecutables 
+*.exe
+
+# Ignorar carpeta y contenido
+resultados/
+
+# Ignorar subcarpeta y contenido 
+resultados/prueba
+
+# Ignorar carpeta excepto una subcarpeta
+!resultados/prueba
+
+# Ignorar carpeta en cualquier directorio raiz
+**/resultados/prueba/*
+
+# Ignora todos los archivos .data
+*.data 
+
+# Excepto el archivo final.data
+!final.data 
+
+
