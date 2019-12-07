@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Digitalizaci&oacute;n</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">    
+	<link rel="stylesheet" href="css/font-awesome.css">
+	<link rel="stylesheet" href="css/stylesheet-image-based.css">
+	<link rel="stylesheet" href="css/estilos.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/cropper.css">
+	
+	<script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>	
+	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+	
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>    
+	<script type="text/javascript" src="js/jquery.blockUI.js"></script>  
+	<script type="text/javascript" src="js/cropper.js"></script>    <!-- libreria de corte, rotacion, movimiento-->
+	<script type="text/javascript" src="js/blobUtil.js"></script>	<!-- libreria convertir archivo binario a blob -->
+	<script type="text/javascript" src="js/tesseract.js"></script>	<!-- libreria lectira OCR -->
+	<script type="text/javascript" src="js/tiff.min.js"></script>	<!-- libreria lectura de imagenes tiff -->						
+	<script type="text/javascript" src="js/glfx.js"></script>		<!-- libreria editor contraste, brillo, filtros -->				
+	<script type="text/javascript" src="js/FileSaver.js"></script>	<!-- libreria para guardar blob localmente -->
+	<script type="text/javascript" src="js/archivos.js"></script>	<!-- manejo del guardado local de la lista de imagenes-->						
+	<script type="text/javascript" src="js/edicionImagenes.js"></script>	<!-- manejo de todo el editor (libreria corte y libreria constraste) -->	
+	<script type="text/javascript" src="js/init.js"></script>		<!-- configuraciones iniciales -->
+	
+</head>
+<body>		
+	<div class="marco">	
+		<div class="espacioTrabajo">
+			<div class="imagenes">
+				<div class="listaImagenes">
+				</div>
+				
+				<div class="imagen">				
+					<div id="puntos"></div>
+					<canvas id="imagen"></canvas>					
+				</div>
+			</div>			
+			
+			<div class="botones">
+				<!--Guardar-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary btn-lg" data-method="escanear" id="btnEscanear">Escanear</button>
+					<button type="button" class="btn btn-success btn-lg" data-method="guardarImagenes" id="btnGuardar">Guardar</button>												
+					<button type="button" class="btn btn-danger btn-lg" data-method="borrarImagen" id="btnEliminar">Eliminar</button>
+				</div>	
+				
+				<!--posicion-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="posicionarImagen" title="Mover Imagen">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrows"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="btn btn-primary" data-method="posicionarCorte" title="Mover Corte">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-crop"></span>
+						</span>
+					</button>
+				</div>		
+		
+				<!--rotacion-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="rotar" data-option="-45" title="Rotar a la Izquierda">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-rotate-left"></span>
+						</span>
+					</button>	
+
+					<button type="button" class="btn btn-primary" data-method="rotar" data-option="45" title="Rotate a la Derecha">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+						  <span class="fa fa-rotate-right"></span>
+						</span>
+					</button>			
+				</div>
+				
+				<!--voltear-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="volteoX" data-option="-1" title="Volteo Horizontal">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrows-h"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="btn btn-primary" data-method="volteoY" data-option="-1" title="Volteo Vertical">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrows-v"></span>
+						</span>
+					</button>
+				</div>
+				
+				<!--mover-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="mover" data-option="-10" data-second-option="0" title="Move Izquierda">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrow-left"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="btn btn-primary" data-method="mover" data-option="10" data-second-option="0" title="Mover Derecha">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrow-right"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="btn btn-primary" data-method="mover" data-option="0" data-second-option="-10" title="Mover Arriba">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrow-up"></span>
+						</span>
+					</button>
+				
+					<button type="button" class="btn btn-primary" data-method="mover" data-option="0" data-second-option="10" title="Mover Abajo">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-arrow-down"></span>
+						</span>
+					</button>
+				</div>
+				
+				<!--zoom-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="zoom" data-option="0.1" title="Acercar">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-search-plus"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="btn btn-primary" data-method="zoom" data-option="-0.1" title="Alejar">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-search-minus"></span>
+						</span>
+					</button>
+				</div>			
+											
+				<!--habilitar-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="deshabilitar" title="Deshabilitar Edici&oacute;n">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-lock"></span>
+						</span>
+					</button>
+				
+					<button type="button" class="btn btn-primary" data-method="habilitar" title="Habilitar Edici&oacute;n">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-unlock"></span>
+						</span>
+					</button>				
+				</div>
+													
+				<!--reset, cargar imagen-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="reset" title="Reset">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-refresh"></span>
+						</span>
+					</button>
+					
+					<label class="btn btn-primary btn-upload" for="importarImagen" title="Cargar Imagen...">
+						<input type="file" class="sr-only" id="importarImagen" name="file" accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Importar imagen con Blob URLs">
+							<span class="fa fa-file-image-o"></span>
+						</span>
+					</label>	
+					
+					
+					<label class="btn btn-primary btn-upload" for="importarWork" title="Cargar Trabajo...">
+						<input type="file" class="sr-only" id="importarWork" name="file" accept=".txt">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Cargar Trabajo de Escaneo">
+							<span class="fa fa-file"></span>
+						</span>
+					</label>
+				</div>
+					
+				<!--cortar, editar, guardar, ocr-->
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" data-method="editar" id="btnEditar" title="Editar">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-pencil-square-o"></span>
+						</span>
+					</button>					 
+					
+					<button type="button" class="btn btn-primary" data-method="ok" title="Guardar Cambios">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-check"></span>
+						</span>
+					</button>	
+
+					<button type="button" class="btn btn-primary" data-method="ocr" title="OCR">
+						<span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="">
+							<span class="fa fa-search"></span>
+						</span>
+					</button>
+				</div>
+			</div>
+			
+			<div class="estilosImagen">	
+				<table id="propiedades">
+					<tbody>
+						<tr>
+							<th>Filtro:</th>
+							<td><select id="filtros"></select></td>
+						</tr>						
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+		<div class="control">				
+			<div class="dispositivos">
+				<label>Lista de Dipositivos</label>
+				<br/>
+				<select id="dispositivos"></select>
+			</div>
+			
+			<div class="propiedades">
+				<div class="escala">
+					<label>Escala</label><br/>					
+					
+					<input type="radio" id="blancoNegro" name="escala" value="0">
+					<label>Blanco y Negro</label><br/>
+					
+					<input type="radio" id="gris" name="escala" value="1">	
+					<label>Escala Grises</label><br/>
+					
+					<input type="radio" id="color" name="escala" value="2">	
+					<label>Color</label>
+				</div>				
+				
+				<div class="resolucion">
+					<label>Resoluci&oacute;n</label>
+					<br/>
+					<select id="dpi"></select>
+				</div>
+				
+				<div class="tam">
+					<label>Tama&ntilde;os</label>
+					<br/>
+					<select id="tam"></select>
+				</div>
+				
+				<div style="clear: both;"></div>
+				
+				<div class="dCara">
+					<input type="checkbox" id="dobleCara" value="1" checked>	
+					<label>Doble Cara</label>
+				</div>
+			</div>			
+
+			<div class="guardarTrabajo">
+				<input type="checkbox" id="guardaLocal" value="1">	
+				<label>Consevar Escaneo Localmente</label>
+			</div>	
+			
+			<div class="docs-preview">
+				<div class="img-preview preview-lg"></div>
+			</div>
+			
+			<div class="datosImagen">
+			
+				<table class="datosImagenTabla">
+					<thead>
+						<tr>
+							<th colspan="4"><label>Datos Imagen</label></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th><label>Ancho</label></th>
+							<td><p id="diAncho"></p></td>						
+							<th><label>Alto</label></th>
+							<td><p id="diAlto"></p></td>
+						</tr>											
+						<tr>
+							<th><label>Ancho Corte</label></th>
+							<td><p id="diAnchoCorte"></p></td>						
+							<th><label>Alto Corte</label></th>
+							<td><p id="diAltoCorte"></p></td>
+						</tr>
+					</tbody>
+				</table>	
+				
+			</div>
+		</div>
+	</div>		
+</body>
+</html>
