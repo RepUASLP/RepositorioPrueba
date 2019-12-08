@@ -1,0 +1,11 @@
+commit 047d0dee487058a8495566fee1669c08a97c76c5
+Author: JCarlos <jcramirezing@gmail.com>
+Date:   Fri Dec 6 19:28:59 2019 -0600
+
+    Se agrea archivo .gitignore
+
+commit 17b7e1928ac516ec5205f97cf6c40353b9018c0f
+Author: JCarlos <jcramirezing@gmail.com>
+Date:   Fri Dec 6 18:53:43 2019 -0600
+
+    Inicio
